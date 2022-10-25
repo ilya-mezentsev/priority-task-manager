@@ -1,0 +1,46 @@
+[
+  {
+    "key": "priority-10",
+    "value": 10
+  },
+  {
+    "key": "priority-9",
+    "value": 9
+  },
+  {
+    "key": "priority-8",
+    "value": 8
+  },
+  {
+    "key": "priority-7",
+    "value": 7
+  },
+  {
+    "key": "priority-6",
+    "value": 6
+  },
+  {
+    "key": "priority-5",
+    "value": 5
+  },
+  {
+    "key": "priority-4",
+    "value": 4
+  },
+  {
+    "key": "priority-3",
+    "value": 3
+  },
+  {
+    "key": "priority-2",
+    "value": 2
+  },
+  {
+    "key": "priority-1",
+    "value": 1
+  },
+  {
+    "key": "priority-0",
+    "value": 0
+  }
+]

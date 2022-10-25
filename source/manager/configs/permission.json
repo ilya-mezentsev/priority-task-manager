@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "permission_resolver_url": "http://127.0.0.1:8080/permissions",
+  "request_timeout": 5,
+  "cache_lifetime_seconds": 300,
+  "load_levels": [
+    {
+      "version_id": "regular",
+      "max_latency": 0.7
+    },
+    {
+      "version_id": "medium-load",
+      "max_latency": 1.4
+    },
+    {
+      "version_id": "high-load",
+      "max_latency": 2.1
+    }
+  ],
+  "default_version_id": "regular",
+  "critical_version_id": "critical-load"
+}

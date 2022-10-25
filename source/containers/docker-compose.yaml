@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - "5555:5432"
+    environment:
+      TZ: Europe/Moscow
+      POSTGRES_USER: task-manager
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: task_manager
+    volumes:
+      - './postgresql/pg.sql:/docker-entrypoint-initdb.d/pg.sql'
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - './rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  permission-service:
+    tty: false
+    build: ./permission_service
+    command: sh -c "make backend-run-minimal"
+    ports:
+      - "8080:8080"

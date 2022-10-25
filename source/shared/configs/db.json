@@ -1,0 +1,12 @@
+{
+  "host": "localhost",
+  "port": 5555,
+  "user": "task-manager",
+  "password": "password",
+  "db_name": "task_manager",
+  "connection": {
+    "retry_count": 7,
+    "retry_timeout": 3
+  },
+  "cache_lifetime_seconds": 300
+}

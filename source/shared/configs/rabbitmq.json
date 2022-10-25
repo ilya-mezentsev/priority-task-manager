@@ -1,0 +1,19 @@
+{
+  "host": "localhost",
+  "port": 5672,
+  "user": "task-manager",
+  "password": "password",
+  "publishing_timeout_seconds": 5,
+
+  "queue": {
+    "name": "todo-list",
+    "max_priority": 10,
+    "durable": false,
+    "auto_delete": false,
+    "exclusive": false,
+    "no_wait": false,
+    "auto_ack": true,
+    "no_local": false,
+    "consumer": ""
+  }
+}
