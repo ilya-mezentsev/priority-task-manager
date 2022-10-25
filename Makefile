@@ -78,6 +78,9 @@ all-tidy: manager-tidy executor-tidy status-tidy metrics-tidy
 containers-run:
 	 COMPOSE_PROJECT_NAME=$(PROJECT_NAME) docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) up
 
+containers-build:
+	COMPOSE_PROJECT_NAME=$(PROJECT_NAME) docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) build
+
 containers-clean:
 	 COMPOSE_PROJECT_NAME=$(PROJECT_NAME) docker-compose -f $(DOCKER_COMPOSE_ENTRYPOINT) down
 

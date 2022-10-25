@@ -1,1 +1,184 @@
-{"resources":[{"id":"priority-100","title":"","linksTo":null,"permissions":[{"id":"cf06a5c76138e0b8ba18c23d5e5e7002","operation":"create","effect":"permit"},{"id":"3c1234410e68166d80f38d18e4648b07","operation":"create","effect":"deny"},{"id":"205edfd8078d48d354a16d1be66ddb11","operation":"read","effect":"permit"},{"id":"4b56e4551eea0ccd43d7307bd059ccf9","operation":"read","effect":"deny"},{"id":"add2484b4e9686f7f7c5792bc7be4c2b","operation":"update","effect":"permit"},{"id":"19a7cf8754c9fefec60f321fd7151203","operation":"update","effect":"deny"},{"id":"082b216514871bf74b6b7706a6f3dbb6","operation":"delete","effect":"permit"},{"id":"3b994abb74b0c5e6227a479b58ce5953","operation":"delete","effect":"deny"}]},{"id":"priority-90","title":"","linksTo":null,"permissions":[{"id":"a4db2ffe706eb8a195b5ff3affd98651","operation":"create","effect":"permit"},{"id":"a1467611b7283d9e66febe7b8fd13ee3","operation":"create","effect":"deny"},{"id":"023610c33a57453bb624775c3cd3b173","operation":"read","effect":"permit"},{"id":"c4ce0e22ecd0a6ec0edf02c88ea1cdc0","operation":"read","effect":"deny"},{"id":"616861052a6f5533c5bdf3c5476c5092","operation":"update","effect":"permit"},{"id":"32d427103d47ad8ee5ada8cf9172424e","operation":"update","effect":"deny"},{"id":"997d91938ede75a231b76bab7dbee637","operation":"delete","effect":"permit"},{"id":"9537982c74fcbbe2046d0a4f88403f97","operation":"delete","effect":"deny"}]}],"roles":[{"id":"role-1","versionId":"default","title":"","permissions":["a4db2ffe706eb8a195b5ff3affd98651","c4ce0e22ecd0a6ec0edf02c88ea1cdc0","32d427103d47ad8ee5ada8cf9172424e","9537982c74fcbbe2046d0a4f88403f97","3c1234410e68166d80f38d18e4648b07","4b56e4551eea0ccd43d7307bd059ccf9","19a7cf8754c9fefec60f321fd7151203","3b994abb74b0c5e6227a479b58ce5953"],"extends":null},{"id":"role-2","versionId":"default","title":"","permissions":null,"extends":["role-1"]},{"id":"role-3","versionId":"default","title":"","permissions":["cf06a5c76138e0b8ba18c23d5e5e7002","4b56e4551eea0ccd43d7307bd059ccf9","19a7cf8754c9fefec60f321fd7151203","3b994abb74b0c5e6227a479b58ce5953","a4db2ffe706eb8a195b5ff3affd98651","c4ce0e22ecd0a6ec0edf02c88ea1cdc0","32d427103d47ad8ee5ada8cf9172424e","9537982c74fcbbe2046d0a4f88403f97"],"extends":null}],"default_roles_version_id":"default"}
+{
+    "resources": [
+        {
+            "id": "priority-10",
+            "title": "",
+            "linksTo": null,
+            "permissions": [
+                {
+                    "id": "017912aada333d939cbd1213cdb69289",
+                    "operation": "create",
+                    "effect": "permit"
+                },
+                {
+                    "id": "0e53048096024dcb057bea657b072be9",
+                    "operation": "create",
+                    "effect": "deny"
+                },
+                {
+                    "id": "5c7adcaa781dfebfc6688fd1c7dad5cf",
+                    "operation": "read",
+                    "effect": "permit"
+                },
+                {
+                    "id": "a96db42439070146f5d0c1ffb674e9a8",
+                    "operation": "read",
+                    "effect": "deny"
+                },
+                {
+                    "id": "e2406f272b30d60611d0f70aafbfeb96",
+                    "operation": "update",
+                    "effect": "permit"
+                },
+                {
+                    "id": "4e450c978736170ad342ee5e276258a4",
+                    "operation": "update",
+                    "effect": "deny"
+                },
+                {
+                    "id": "a62d386de0343c3faf315d90c1c169cf",
+                    "operation": "delete",
+                    "effect": "permit"
+                },
+                {
+                    "id": "0e44fbd95dd32b2c6a04cc94da6ddae3",
+                    "operation": "delete",
+                    "effect": "deny"
+                }
+            ]
+        },
+        {
+            "id": "priority-9",
+            "title": "",
+            "linksTo": null,
+            "permissions": [
+                {
+                    "id": "50ef81614b978c0ad3e63596d5be0199",
+                    "operation": "create",
+                    "effect": "permit"
+                },
+                {
+                    "id": "9d8e9ac06dfef62d9e0309d07f29b568",
+                    "operation": "create",
+                    "effect": "deny"
+                },
+                {
+                    "id": "a840ca94cf0176522696f254fa4eda5f",
+                    "operation": "read",
+                    "effect": "permit"
+                },
+                {
+                    "id": "88de36b4344686ae8b52a9813e0e58d6",
+                    "operation": "read",
+                    "effect": "deny"
+                },
+                {
+                    "id": "139a60b3d2007de228b5e352211cb593",
+                    "operation": "update",
+                    "effect": "permit"
+                },
+                {
+                    "id": "87a8e11430f989a17d82a4c2ffc36c82",
+                    "operation": "update",
+                    "effect": "deny"
+                },
+                {
+                    "id": "ef827eb58213ced655580903052291ed",
+                    "operation": "delete",
+                    "effect": "permit"
+                },
+                {
+                    "id": "4014bddefa28960200bcc2be0c587cd2",
+                    "operation": "delete",
+                    "effect": "deny"
+                }
+            ]
+        },
+        {
+            "id": "priority-8",
+            "title": "",
+            "linksTo": null,
+            "permissions": [
+                {
+                    "id": "faeee5859c297fe01c2784f1751c20b4",
+                    "operation": "create",
+                    "effect": "permit"
+                },
+                {
+                    "id": "2a1c08b25d7afb8e26cc1d6374f7a221",
+                    "operation": "create",
+                    "effect": "deny"
+                },
+                {
+                    "id": "45031befce2839e44a7eb8b0c0ad9477",
+                    "operation": "read",
+                    "effect": "permit"
+                },
+                {
+                    "id": "07f683e734f34d1ec0e302a09d60e7f4",
+                    "operation": "read",
+                    "effect": "deny"
+                },
+                {
+                    "id": "ac2832b0cdc56dd0c84a8416eb8eca2a",
+                    "operation": "update",
+                    "effect": "permit"
+                },
+                {
+                    "id": "4a1c5e8def0805cecbec19c81053d695",
+                    "operation": "update",
+                    "effect": "deny"
+                },
+                {
+                    "id": "a74526a2630790bd83481a9c1ea2d2ef",
+                    "operation": "delete",
+                    "effect": "permit"
+                },
+                {
+                    "id": "d3c9baaeee8932b2352d4825c3f495de",
+                    "operation": "delete",
+                    "effect": "deny"
+                }
+            ]
+        }
+    ],
+    "roles": [
+        {
+            "id": "role-1",
+            "versionId": "default",
+            "title": "",
+            "permissions": [
+                "faeee5859c297fe01c2784f1751c20b4",
+                "07f683e734f34d1ec0e302a09d60e7f4",
+                "4a1c5e8def0805cecbec19c81053d695",
+                "d3c9baaeee8932b2352d4825c3f495de"
+            ],
+            "extends": null
+        },
+        {
+            "id": "role-2",
+            "versionId": "default",
+            "title": "",
+            "permissions": [
+                "50ef81614b978c0ad3e63596d5be0199",
+                "88de36b4344686ae8b52a9813e0e58d6",
+                "87a8e11430f989a17d82a4c2ffc36c82",
+                "4014bddefa28960200bcc2be0c587cd2"
+            ],
+            "extends": null
+        },
+        {
+            "id": "role-3",
+            "versionId": "default",
+            "title": "",
+            "permissions": [
+                "017912aada333d939cbd1213cdb69289",
+                "a96db42439070146f5d0c1ffb674e9a8",
+                "4e450c978736170ad342ee5e276258a4",
+                "0e44fbd95dd32b2c6a04cc94da6ddae3"
+            ],
+            "extends": null
+        }
+    ],
+    "default_roles_version_id": "default"
+}

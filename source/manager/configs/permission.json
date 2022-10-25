@@ -17,6 +17,6 @@
       "max_latency": 2.1
     }
   ],
-  "default_version_id": "regular",
+  "default_version_id": "default",
   "critical_version_id": "critical-load"
 }
