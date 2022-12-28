@@ -1,10 +1,12 @@
 package app
 
 import (
-	"log"
 	"os"
 	"priority-task-manager/executor/internal/configs"
-	"priority-task-manager/shared/pkg/services/queue/rabbitmq"
+	"priority-task-manager/executor/internal/services"
+	"priority-task-manager/shared/pkg/services/db/connection"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func Main() {
@@ -14,22 +16,9 @@ func Main() {
 		log.Fatalf("Unable to parse configs by path %s, got error %v\n", configsPath, err)
 	}
 
-	channel, err := rabbitmq.InitChannel(settings.RabbitMQ)
-	if err != nil {
-		log.Fatalf("Failed to init rabbitmq channel: %v", err)
-	}
+	db := connection.MustGetConnection(settings.DB)
+	ss := services.MakeServices(settings, db)
 
-	msgs, err := channel.Consume(
-		settings.RabbitMQ.Queue.Name,
-		settings.RabbitMQ.Queue.Consumer,
-		settings.RabbitMQ.Queue.AutoAck,
-		settings.RabbitMQ.Queue.Exclusive,
-		settings.RabbitMQ.Queue.NoLocal,
-		settings.RabbitMQ.Queue.NoWait,
-		nil, // args
-	)
-
-	for d := range msgs {
-		log.Printf("Received a message: %s", d.Body)
-	}
+	log.Info("Starting consume tasks from queue")
+	ss.TaskConsumer().StartConsume()
 }

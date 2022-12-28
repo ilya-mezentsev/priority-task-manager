@@ -7,6 +7,11 @@ type (
 		Get(key Key) (Model, error)
 	}
 
+	// NoKeyReader интерфейс для запросов данных без аргументов
+	NoKeyReader[Model any] interface {
+		Get() (Model, error)
+	}
+
 	Repository[Model any, Key comparable] interface {
 		Reader[Model, Key]
 		Add(entity Model) error

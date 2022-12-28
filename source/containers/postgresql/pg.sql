@@ -19,6 +19,7 @@ CREATE TABLE task_stat(
     uuid VARCHAR(36) UNIQUE NOT NULL,
     account_hash VARCHAR(32) REFERENCES account(hash),
     status VARCHAR(42) NOT NULL,
+    type VARCHAR(42) NOT NULL,
     added_to_queue TIMESTAMP NOT NULL,
     extracted_from_queue TIMESTAMP DEFAULT NULL,
     completed TIMESTAMP DEFAULT NULL

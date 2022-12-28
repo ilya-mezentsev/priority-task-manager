@@ -7,7 +7,7 @@ import (
 	"priority-task-manager/shared/pkg/services/settings"
 )
 
-// InitChannel для подключения к rabbitmq и созданию очереди
+// InitChannel для подключения к rabbitmq и создания очереди
 func InitChannel(settings settings.RabbitMQSettings) (*amqp.Channel, error) {
 	conn, err := amqp.Dial(
 		fmt.Sprintf("amqp://%s:%s@%s:%d/", settings.User, settings.Password, settings.Host, settings.Port))

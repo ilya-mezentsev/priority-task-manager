@@ -12,7 +12,7 @@
     "auto_delete": false,
     "exclusive": false,
     "no_wait": false,
-    "auto_ack": true,
+    "auto_ack": false,
     "no_local": false,
     "consumer": ""
   }

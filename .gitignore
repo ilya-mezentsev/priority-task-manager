@@ -25,3 +25,5 @@ go.work
 source/shared/configs/main.json
 
 .idea
+venv/
+__pycache__/

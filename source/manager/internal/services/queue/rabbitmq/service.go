@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"priority-task-manager/manager/internal/services/queue"
+	"priority-task-manager/shared/pkg/types"
 	"time"
 )
 
@@ -22,7 +22,7 @@ func MakeService(queueName string, publishingTimeoutSeconds int, channel *amqp.C
 	}
 }
 
-func (s Service) Add(task queue.Task[any]) error {
+func (s Service) Add(task types.Task, priority int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.publishingTimeoutSeconds)*time.Second)
 	defer cancel()
 
@@ -40,7 +40,7 @@ func (s Service) Add(task queue.Task[any]) error {
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        encodedTask,
-			Priority:    uint8(task.Priority),
+			Priority:    uint8(priority),
 		},
 	)
 }

@@ -28,13 +28,14 @@ func (tc TaskController) Handle(context *gin.Context) {
 		context.String(http.StatusInternalServerError, "Server got itself in trouble")
 	}
 
-	err := tc.service.ProcessTask(task.Request{
+	taskUUID, err := tc.service.ProcessTask(task.Request{
 		Account: account.(types.Account),
 		Task:    r,
 	})
 	if err != nil {
 		context.String(http.StatusInternalServerError, "Server got itself in trouble")
 	} else {
+		context.Header("X-Created-Task-UUID", taskUUID)
 		context.String(http.StatusOK, "OK")
 	}
 }

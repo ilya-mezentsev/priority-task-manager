@@ -5,13 +5,14 @@ import (
 	"priority-task-manager/shared/pkg/types"
 )
 
-//goland:noinspection SqlNoDataSourceInspection
+//goland:noinspection ALL
 const (
 	getTaskQuery = `
 	select
 		uuid,
 		account_hash,
 		status,
+		type,
 		added_to_queue,
 		extracted_from_queue,
 		completed
@@ -21,10 +22,11 @@ const (
 
 	addTaskQuery = `
 	insert into
-	task_stat(uuid, account_hash, status, added_to_queue, extracted_from_queue, completed)
-	values(:uuid, :account_hash, :status, :added_to_queue, :extracted_from_queue, :completed)
+	task_stat(uuid, account_hash, status, type, added_to_queue, extracted_from_queue, completed)
+	values(:uuid, :account_hash, :status, :type, :added_to_queue, :extracted_from_queue, :completed)
 	`
 
+	// todo как-то хитро обновлять время extracted_from_queue; нужно этого НЕ делать, если completed уже заполнено
 	updateTaskQuery = `
 	update task_stat
 	set
@@ -61,6 +63,7 @@ func (t Task) taskToMap(entity types.Task) map[string]any {
 		"uuid":                 entity.UUID,
 		"account_hash":         entity.AccountHash,
 		"status":               entity.Status,
+		"type":                 entity.Type,
 		"added_to_queue":       entity.AddedToQueue,
 		"extracted_from_queue": entity.ExtractedFromQueue,
 		"completed":            entity.Completed,
@@ -82,6 +85,6 @@ func (t Task) Update(entity types.Task) error {
 	return err
 }
 
-func (t Task) Delete(id types.ID) error {
+func (t Task) Delete(_ types.ID) error {
 	panic("not implemented")
 }

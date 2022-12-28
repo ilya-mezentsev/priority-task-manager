@@ -1,8 +1,8 @@
 package services
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
 	"priority-task-manager/manager/internal/configs"
 	"priority-task-manager/manager/internal/services/permission"
 	"priority-task-manager/manager/internal/services/queue/rabbitmq"
@@ -38,7 +38,7 @@ func MakeServices(settings configs.Settings, db *sqlx.DB) Services {
 
 	channel, err := sharedRabbitmq.InitChannel(settings.RabbitMQ)
 	if err != nil {
-		panic(fmt.Sprintf("Unable to init services. Initing rabbitmq channel failed"))
+		log.Fatalf("Unable to init services. Rabbitmq channel init failed: %v", err)
 	}
 
 	s.queue = rabbitmq.MakeService(

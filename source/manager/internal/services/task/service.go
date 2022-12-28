@@ -29,47 +29,43 @@ func MakeService(
 }
 
 // ProcessTask превичная обработка задачи: вычисляем приоритет на основе роли аккаунта, помещаем в очередь и добавляем в БД
-func (s Service) ProcessTask(request Request) error {
+func (s Service) ProcessTask(request Request) (string, error) {
 	priority, err := s.queuePriority.DetermineMaxPriority(request.Account.Role)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"request": request,
 		}).Errorf("unable to determine max priority: %v", err)
 
-		return err
+		return "", err
 	}
 
-	t := queue.Task[any]{
-		Priority:    priority,
-		UUID:        uuid.New().String(),
-		AccountHash: request.Account.Hash,
-		Type:        request.Task.Type,
-		Data:        request.Task.Data,
+	t := types.Task{
+		UUID:         uuid.New().String(),
+		AccountHash:  request.Account.Hash,
+		Type:         request.Task.Type,
+		Data:         request.Task.Data,
+		Status:       types.InitialStatus,
+		AddedToQueue: time.Now(),
 	}
-	err = s.queueImpl.Add(t)
+	err = s.queueImpl.Add(t, priority)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"request": request,
 			"task":    t,
 		}).Errorf("Unable to add task to queue: %v", err)
 
-		return err
+		return "", err
 	}
 
-	err = s.repository.Add(types.Task{
-		UUID:         t.UUID,
-		AccountHash:  t.AccountHash,
-		Status:       types.InitialStatus,
-		AddedToQueue: time.Now(),
-	})
+	err = s.repository.Add(t)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"request": request,
 			"task":    t,
 		}).Errorf("Unable to add task to DB: %v", err)
 
-		return err
+		return "", err
 	}
 
-	return nil
+	return t.UUID, nil
 }
