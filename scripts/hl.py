@@ -5,6 +5,7 @@ from abc import abstractmethod
 from locust import (
     HttpUser,
     task,
+    between,
 )
 from locust.clients import HttpSession
 
@@ -42,6 +43,8 @@ class UserMixin:
 
 
 class Role1User(HttpUser, UserMixin):
+    wait_time = between(0.1, 0.2)
+
     @task
     def do_task(self) -> None:
         self.do_request()
@@ -51,6 +54,8 @@ class Role1User(HttpUser, UserMixin):
 
 
 class Role2User(HttpUser, UserMixin):
+    wait_time = between(0.1, 0.2)
+
     @task
     def do_task(self) -> None:
         self.do_request()
@@ -60,6 +65,8 @@ class Role2User(HttpUser, UserMixin):
 
 
 class Role3User(HttpUser, UserMixin):
+    wait_time = between(0.1, 0.2)
+
     @task
     def do_task(self) -> None:
         self.do_request()

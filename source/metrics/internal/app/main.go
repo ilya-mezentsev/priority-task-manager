@@ -7,7 +7,12 @@ import (
 	"priority-task-manager/metrics/internal/services"
 	"priority-task-manager/metrics/internal/transport/web"
 	"priority-task-manager/shared/pkg/services/db/connection"
+	myLogger "priority-task-manager/shared/pkg/services/log"
 )
+
+func init() {
+	myLogger.Configure()
+}
 
 func Main() {
 	configsPath := os.Args[1]

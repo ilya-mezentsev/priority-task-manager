@@ -1,13 +1,17 @@
 package app
 
 import (
+	log "github.com/sirupsen/logrus"
 	"os"
 	"priority-task-manager/executor/internal/configs"
 	"priority-task-manager/executor/internal/services"
 	"priority-task-manager/shared/pkg/services/db/connection"
-
-	log "github.com/sirupsen/logrus"
+	myLogger "priority-task-manager/shared/pkg/services/log"
 )
+
+func init() {
+	myLogger.Configure()
+}
 
 func Main() {
 	configsPath := os.Args[1]

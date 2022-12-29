@@ -1,6 +1,10 @@
 package types
 
-type Account struct {
-	Hash string `db:"hash"`
-	Role string `db:"role"`
-}
+type (
+	Role string
+
+	Account struct {
+		Hash string `db:"hash"`
+		Role Role   `db:"role"`
+	}
+)

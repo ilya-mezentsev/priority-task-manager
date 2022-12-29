@@ -66,7 +66,7 @@ func (resolver Resolver) Get(key ResolveRequest) (bool, error) {
 func (resolver Resolver) makeQuery(request ResolveRequest, httpReq *http.Request) {
 	q := httpReq.URL.Query()
 
-	q.Add("roleId", request.RoleId)
+	q.Add("roleId", string(request.RoleId))
 	q.Add("resourceId", request.ResourceId)
 	q.Add("operation", request.Operation)
 	if request.RolesVersionId != "" {

@@ -4,6 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"priority-task-manager/manager/internal/services/permission"
 	"priority-task-manager/shared/pkg/repositories"
+	"priority-task-manager/shared/pkg/types"
 	"sort"
 )
 
@@ -37,7 +38,7 @@ func sortQueuePriorities(queuePriorities []Settings) []Settings {
 	return sortedQueuePriorities
 }
 
-func (s Service) DetermineMaxPriority(role string) (int, error) {
+func (s Service) DetermineMaxPriority(role types.Role) (int, error) {
 	for _, priority := range s.queuePriorities {
 		isPriorityAvailable, err := s.permissionResolver.Get(permission.ResolveRequest{
 			RoleId:         role,

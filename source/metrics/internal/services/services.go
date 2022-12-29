@@ -5,11 +5,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	repositoriesConstructor "priority-task-manager/metrics/internal/repositories"
 	"priority-task-manager/metrics/internal/services/metrics"
+	"sync"
 	"time"
 )
 
 type Services struct {
 	taskCountMetricsService metrics.TaskCountService
+	queueWaitingTimeService metrics.QueueWaitingTimeService
 }
 
 func MakeServices(db *sqlx.DB) Services {
@@ -20,6 +22,11 @@ func MakeServices(db *sqlx.DB) Services {
 			repositories.InQueueTaskCountRepository(),
 			repositories.InProgressTaskCountRepository(),
 		),
+
+		queueWaitingTimeService: metrics.MustMakeQueueWaitingTimeService(
+			repositories.UniqueRolesRepository(),
+			repositories.AvgQueueWaitingTimeRepository(),
+		),
 	}
 }
 
@@ -27,15 +34,25 @@ func (ss Services) StartObserveMetrics() {
 	targets := map[string]func() error{
 		"update_in_progress_tasks_count": ss.taskCountMetricsService.UpdateInProgress,
 		"update_queued_tasks_count":      ss.taskCountMetricsService.UpdateQueued,
+		"update_queue_waiting_time":      ss.queueWaitingTimeService.UpdateForEachRole,
 	}
 
 	for {
+		var wg sync.WaitGroup
 		for key, target := range targets {
-			err := target()
-			if err != nil {
-				log.Errorf("Unable to exec %s: %v\n", key, err)
-			}
+			wg.Add(1)
+
+			go func(key string, target func() error) {
+				defer wg.Done()
+
+				err := target()
+				if err != nil {
+					log.Errorf("Unable to exec %s: %v\n", key, err)
+				}
+			}(key, target)
 		}
+
+		wg.Wait()
 
 		time.Sleep(time.Second * 2)
 	}
