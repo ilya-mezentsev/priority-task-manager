@@ -26,12 +26,13 @@ services:
     build: ./permission_service
     command: sh -c "make backend-run-minimal"
     ports:
-      - "8080:8080"
+      - '8080:8080'
 
   prometheus:
     build:
       context: ./monitoring/
     command:
-      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    network_mode: 'host'
     ports:
-      - "9090:9090"
+      - '9090:9090'
