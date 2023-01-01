@@ -2,6 +2,7 @@ package worker
 
 import (
 	"priority-task-manager/shared/pkg/types"
+	"time"
 )
 
 type Pool struct {
@@ -23,9 +24,21 @@ func (p *Pool) Exec(task types.Task) {
 }
 
 func (p *Pool) exec(task types.Task) {
-	defer func() {
-		<-p.workers
-	}()
+	defer p.releaseWorker()
 
 	p.executor.Exec(task)
+}
+
+func (p *Pool) releaseWorker() {
+	<-p.workers
+}
+
+func (p *Pool) WaitForAllDone() {
+	for {
+		if len(p.workers) == 0 {
+			break
+		}
+
+		time.Sleep(2 * time.Second)
+	}
 }

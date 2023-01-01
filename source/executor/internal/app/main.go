@@ -1,12 +1,15 @@
 package app
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"os/signal"
 	"priority-task-manager/executor/internal/configs"
 	"priority-task-manager/executor/internal/services"
 	"priority-task-manager/shared/pkg/services/db/connection"
 	myLogger "priority-task-manager/shared/pkg/services/log"
+	"syscall"
 )
 
 func init() {
@@ -24,5 +27,30 @@ func Main() {
 	ss := services.MakeServices(settings, db)
 
 	log.Info("Starting consume tasks from queue")
-	ss.TaskConsumer().StartConsume()
+	go ss.TaskConsumer().StartConsume()
+	waitForSignal(ss)
+}
+
+func waitForSignal(ss services.Services) {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	done := make(chan bool, 1)
+
+	go func() {
+		sig := <-sigs
+
+		fmt.Println()
+		log.Infof("Got signal: %v. Starting graceful shutdown", sig)
+
+		// todo по-хорошему, нужно тут еще по тайм-ауту завершаться (см. time.AfterFunc)
+		ss.TaskConsumer().StopConsume()
+		ss.WorkersPool().WaitForAllDone()
+
+		log.Infof("All tasks is done. Service ready to shutdown")
+
+		done <- true
+	}()
+
+	<-done
+	log.Info("Exiting")
 }

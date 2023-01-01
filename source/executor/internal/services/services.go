@@ -48,3 +48,7 @@ func MakeServices(settings configs.Settings, db *sqlx.DB) Services {
 func (s Services) TaskConsumer() rabbitmq.Service {
 	return s.taskConsumer
 }
+
+func (s Services) WorkersPool() *worker.Pool {
+	return s.workersPool
+}

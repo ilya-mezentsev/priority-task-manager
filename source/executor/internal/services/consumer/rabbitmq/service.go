@@ -10,9 +10,10 @@ import (
 )
 
 type Service struct {
-	workersPool *worker.Pool
-	channel     *amqp.Channel
-	settings    settings.RabbitMQSettings
+	workersPool      *worker.Pool
+	channel          *amqp.Channel
+	settings         settings.RabbitMQSettings
+	consumingStopped bool
 }
 
 func MakeService(
@@ -43,7 +44,12 @@ func (s Service) StartConsume() {
 	}
 
 	for {
-		queuedTask := <-msgs
+		queuedTask, ok := <-msgs
+		if !ok {
+			log.Error("Unable to receive next message from rabbitmq channel")
+			break
+		}
+
 		var task types.Task
 		err = json.Unmarshal(queuedTask.Body, &task)
 		if err != nil {
@@ -58,5 +64,12 @@ func (s Service) StartConsume() {
 
 		// todo надо ли обрабатывать ошибку?
 		_ = queuedTask.Ack(false)
+	}
+}
+
+func (s Service) StopConsume() {
+	err := s.channel.Close()
+	if err != nil {
+		log.Errorf("Unable to close rabbitmq channel: %v", err)
 	}
 }
