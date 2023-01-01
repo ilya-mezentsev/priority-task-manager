@@ -178,6 +178,36 @@
                 "0e44fbd95dd32b2c6a04cc94da6ddae3"
             ],
             "extends": null
+        },
+        {
+            "id": "role-1",
+            "versionId": "damn-load",
+            "title": "",
+            "permissions": [
+                "017912aada333d939cbd1213cdb69289",
+                "a96db42439070146f5d0c1ffb674e9a8",
+                "4e450c978736170ad342ee5e276258a4",
+                "0e44fbd95dd32b2c6a04cc94da6ddae3"
+            ],
+            "extends": null
+        },
+        {
+            "id": "role-2",
+            "versionId": "damn-load",
+            "title": "",
+            "permissions": null,
+            "extends": [
+                "role-1"
+            ]
+        },
+        {
+            "id": "role-3",
+            "versionId": "damn-load",
+            "title": "",
+            "permissions": null,
+            "extends": [
+                "role-1"
+            ]
         }
     ],
     "default_roles_version_id": "default"

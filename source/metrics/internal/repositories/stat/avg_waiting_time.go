@@ -6,28 +6,50 @@ import (
 )
 
 //goland:noinspection all
-const avgWaitingTimeQuery = `
-	select
-		avg(
-			extract(epoch from (extracted_from_queue::timestamp - added_to_queue::timestamp))
-		)
-	from task_stat
-	where
-		extracted_from_queue is not null and
-		(select role from account where hash = account_hash) = $1
-`
+const (
+	avgExtractedWaitingTimeQuery = `
+		select
+			avg(
+				extract(epoch from (extracted_from_queue::timestamp - added_to_queue::timestamp))
+			)
+		from task_stat
+		where
+			extracted_from_queue is not null and
+			(select role from account where hash = account_hash) = $1
+	`
+
+	avgQueuedWaitingTimeQuery = `
+		select
+			avg(
+				extract(epoch from (current_timestamp - added_to_queue::timestamp))
+			)
+		from task_stat
+		where (select role from account where hash = account_hash) = $1
+	`
+)
 
 type AvgWaitingTimeRepository struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	query string
 }
 
-func MakeAvgWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository {
-	return AvgWaitingTimeRepository{db}
+func MakeAvgExtractedWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository {
+	return AvgWaitingTimeRepository{
+		db:    db,
+		query: avgExtractedWaitingTimeQuery,
+	}
+}
+
+func MakeAvgQueuedWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository {
+	return AvgWaitingTimeRepository{
+		db:    db,
+		query: avgExtractedWaitingTimeQuery,
+	}
 }
 
 func (a AvgWaitingTimeRepository) Get(key types.Role) (float64, error) {
 	var avgWaitingTime float64
-	err := a.db.Get(&avgWaitingTime, avgWaitingTimeQuery, key)
+	err := a.db.Get(&avgWaitingTime, a.query, key)
 
 	return avgWaitingTime, err
 }

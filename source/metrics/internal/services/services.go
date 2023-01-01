@@ -25,7 +25,8 @@ func MakeServices(db *sqlx.DB) Services {
 
 		queueWaitingTimeService: metrics.MustMakeQueueWaitingTimeService(
 			repositories.UniqueRolesRepository(),
-			repositories.AvgQueueWaitingTimeRepository(),
+			repositories.AvgExtractedWaitingTimeRepository(),
+			repositories.AvgQueuedWaitingTimeRepository(),
 		),
 	}
 }

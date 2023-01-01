@@ -10,24 +10,31 @@ import (
 )
 
 var (
-	inQueueWaitingTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "tasks_in_queue_waiting_time",
+	extractedFromQueueWaitingTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "extracted_tasks_waiting_time",
+	}, []string{"role"})
+
+	queuedWaitingTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "queued_tasks_waiting_time",
 	}, []string{"role"})
 )
 
 type QueueWaitingTimeService struct {
-	uniqueRoles                   []types.Role
-	uniqueRolesRepository         repositories.NoKeyReader[[]types.Role]
-	avgQueueWaitingTimeRepository repositories.Reader[float64, types.Role]
+	uniqueRoles                       []types.Role
+	uniqueRolesRepository             repositories.NoKeyReader[[]types.Role]
+	avgExtractedWaitingTimeRepository repositories.Reader[float64, types.Role]
+	avgQueuedWaitingTimeRepository    repositories.Reader[float64, types.Role]
 }
 
 func MustMakeQueueWaitingTimeService(
 	uniqueRolesRepository repositories.NoKeyReader[[]types.Role],
-	avgQueueWaitingTimeRepository repositories.Reader[float64, types.Role],
+	avgExtractedWaitingTimeRepository repositories.Reader[float64, types.Role],
+	avgQueuedWaitingTimeRepository repositories.Reader[float64, types.Role],
 ) QueueWaitingTimeService {
 	queueWaitingTimeService := QueueWaitingTimeService{
-		uniqueRolesRepository:         uniqueRolesRepository,
-		avgQueueWaitingTimeRepository: avgQueueWaitingTimeRepository,
+		uniqueRolesRepository:             uniqueRolesRepository,
+		avgExtractedWaitingTimeRepository: avgExtractedWaitingTimeRepository,
+		avgQueuedWaitingTimeRepository:    avgQueuedWaitingTimeRepository,
 	}
 
 	uniqueRoles, err := queueWaitingTimeService.uniqueRolesRepository.Get()
@@ -42,15 +49,22 @@ func MustMakeQueueWaitingTimeService(
 
 func (queueWaitingTimeService QueueWaitingTimeService) UpdateForEachRole() error {
 	var (
-		wg     sync.WaitGroup
+		wg       sync.WaitGroup
+		updaters = []func(types.Role, chan<- error){
+			queueWaitingTimeService.updateExtractedForRole,
+			queueWaitingTimeService.updateQueuedForRole,
+		}
 		errors = make(chan error, len(queueWaitingTimeService.uniqueRoles))
 	)
+
 	for _, role := range queueWaitingTimeService.uniqueRoles {
-		wg.Add(1)
-		go func(role types.Role) {
-			defer wg.Done()
-			queueWaitingTimeService.updateForRole(role, errors)
-		}(role)
+		for _, updater := range updaters {
+			wg.Add(1)
+			go func(role types.Role, updater func(types.Role, chan<- error)) {
+				defer wg.Done()
+				updater(role, errors)
+			}(role, updater)
+		}
 	}
 
 	wg.Wait()
@@ -63,14 +77,28 @@ func (queueWaitingTimeService QueueWaitingTimeService) UpdateForEachRole() error
 	return nil
 }
 
-func (queueWaitingTimeService QueueWaitingTimeService) updateForRole(
+func (queueWaitingTimeService QueueWaitingTimeService) updateExtractedForRole(
 	role types.Role,
 	errors chan<- error,
 ) {
-	waitingTime, err := queueWaitingTimeService.avgQueueWaitingTimeRepository.Get(role)
+	extractedTaskWaitingTime, err := queueWaitingTimeService.avgExtractedWaitingTimeRepository.Get(role)
 	if err != nil {
 		errors <- err
+		return
 	}
 
-	inQueueWaitingTime.WithLabelValues(string(role)).Observe(waitingTime)
+	extractedFromQueueWaitingTime.WithLabelValues(string(role)).Observe(extractedTaskWaitingTime)
+}
+
+func (queueWaitingTimeService QueueWaitingTimeService) updateQueuedForRole(
+	role types.Role,
+	errors chan<- error,
+) {
+	queuedTaskWaitingTime, err := queueWaitingTimeService.avgQueuedWaitingTimeRepository.Get(role)
+	if err != nil {
+		errors <- err
+		return
+	}
+
+	queuedWaitingTime.WithLabelValues(string(role)).Observe(queuedTaskWaitingTime)
 }

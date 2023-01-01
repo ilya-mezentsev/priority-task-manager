@@ -47,6 +47,7 @@ func (vm *VersionManager) UpdateVersionId(latency float64) {
 	for _, level := range vm.sortedLoadLevels {
 		if latency < level.MaxLatency {
 			newVersionId = level.VersionID
+			break
 		}
 	}
 
