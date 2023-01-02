@@ -26,6 +26,7 @@ func (tc TaskController) Handle(context *gin.Context) {
 	if !found {
 		// такого быть не должно
 		context.String(http.StatusInternalServerError, "Server got itself in trouble")
+		return
 	}
 
 	taskUUID, err := tc.service.ProcessTask(task.Request{
