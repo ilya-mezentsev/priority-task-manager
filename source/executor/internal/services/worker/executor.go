@@ -21,8 +21,7 @@ func (e Executor) Exec(task types.Task) {
 	task.Status = types.InProgressStatus
 	e.updateTaskInStorage(task)
 
-	// todo понять, как передавать время "выполнения" в данных задачи (task.Data)
-	time.Sleep(time.Second)
+	time.Sleep(time.Second * time.Duration(task.Data["exec_time"].(float64)))
 
 	task.Completed = time.Now()
 	task.Status = types.SuccessfullyDoneStatus

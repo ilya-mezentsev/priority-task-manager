@@ -32,7 +32,7 @@ class UserMixin:
             json=dict(
                 type=random.choice(TASK_TYPES),
                 data=dict(
-                    exec_time=random.randint(1, 15),
+                    exec_time=random.randint(1, 3),
                     some_id=str(uuid.uuid4()),
                 ),
             ),
