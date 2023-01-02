@@ -28,7 +28,7 @@ func MakeService(
 	}
 }
 
-// ProcessTask превичная обработка задачи: вычисляем приоритет на основе роли аккаунта, помещаем в очередь и добавляем в БД
+// ProcessTask первичная обработка задачи: вычисляем приоритет на основе роли аккаунта, помещаем в очередь и добавляем в БД
 func (s Service) ProcessTask(request Request) (string, error) {
 	priority, err := s.queuePriority.DetermineMaxPriority(request.Account.Role)
 	if err != nil {

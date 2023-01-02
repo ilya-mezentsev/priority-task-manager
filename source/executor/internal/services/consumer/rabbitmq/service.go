@@ -10,10 +10,9 @@ import (
 )
 
 type Service struct {
-	workersPool      *worker.Pool
-	channel          *amqp.Channel
-	settings         settings.RabbitMQSettings
-	consumingStopped bool
+	workersPool *worker.Pool
+	channel     *amqp.Channel
+	settings    settings.RabbitMQSettings
 }
 
 func MakeService(

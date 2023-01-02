@@ -9,6 +9,7 @@ import (
 	"priority-task-manager/executor/internal/services"
 	"priority-task-manager/shared/pkg/services/db/connection"
 	myLogger "priority-task-manager/shared/pkg/services/log"
+	"strconv"
 	"syscall"
 )
 
@@ -23,12 +24,26 @@ func Main() {
 		log.Fatalf("Unable to parse configs by path %s, got error %v\n", configsPath, err)
 	}
 
+	processWorkersCount(&settings)
+
 	db := connection.MustGetConnection(settings.DB)
 	ss := services.MakeServices(settings, db)
 
 	log.Info("Starting consume tasks from queue")
 	go ss.TaskConsumer().StartConsume()
 	waitForSignal(ss)
+}
+
+func processWorkersCount(settings *configs.Settings) {
+	workersCount := os.Getenv("WORKERS_COUNT")
+	if workersCount != "" {
+		parsedWorkersCount, err := strconv.Atoi(workersCount)
+		if err != nil {
+			log.Infof("Got invalid workers count env <%s>, unable to parse: %v", workersCount, err)
+		} else {
+			settings.WorkersPool.MaxWorkersCount = parsedWorkersCount
+		}
+	}
 }
 
 func waitForSignal(ss services.Services) {
