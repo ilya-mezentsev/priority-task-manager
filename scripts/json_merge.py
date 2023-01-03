@@ -2,7 +2,7 @@
 Скрипт для мерджа json-файлов.
 Использовать так:
 
-python3 json-merge.py out-dir file1.json file2.json ... fileN.json
+python3 json_merge.py out-dir file1.json file2.json ... fileN.json
 
 результат:
 Создаем/перезаписываем файл out-dir/main.json. Содержание такое:

@@ -36,7 +36,16 @@ CONTAINERS_DIR := $(SOURCE_DIR)/containers
 DOCKER_COMPOSE_ENTRYPOINT := $(CONTAINERS_DIR)/docker-compose.yaml
 
 SCRIPTS_DIR := $(ROOT_DIR)/scripts
-JSON_MERGE_SCRIPT := $(SCRIPTS_DIR)/json-merge.py
+SCRIPTS_VENV_DIR := $(SCRIPTS_DIR)/venv
+SCRIPTS_VENV_PIP := $(SCRIPTS_VENV_DIR)/bin/pip
+SCRIPTS_VENV_PYTHON := $(SCRIPTS_VENV_DIR)/bin/pip
+SCRIPTS_VENV_LOCUST := $(SCRIPTS_VENV_DIR)/bin/locust
+SCRIPTS_VENV_FLASK := $(SCRIPTS_VENV_DIR)/bin/flask
+SCRIPTS_REQUIREMENTS := $(SCRIPTS_DIR)/requirements.txt
+
+JSON_MERGE_SCRIPT := $(SCRIPTS_DIR)/json_merge.py
+HL_SCRIPT := $(SCRIPTS_DIR)/hl.py
+TASK_EXECUTOR_WRAPPER_SCRIPT := $(SCRIPTS_DIR)/task_executor_wrapper.py
 
 GOMODCACHE = $(SHARED_DIR)/pkg/mod
 
@@ -100,3 +109,18 @@ configs-merge:
 		$(DB_CONFIGS_FILE) \
 		$(RABBITMQ_CONFIGS_FILE) \
 		$(BASIC_AUTH_CONFIGS_FILE)
+
+scripts-venv: scripts-venv-clean scripts-venv-create
+	$(SCRIPTS_VENV_PIP) install -r $(SCRIPTS_REQUIREMENTS)
+
+scripts-venv-create:
+	python3 -m venv $(SCRIPTS_VENV_DIR)
+
+scripts-venv-clean:
+	rm -rf $(SCRIPTS_VENV_DIR)
+
+locust:
+	$(SCRIPTS_VENV_LOCUST) -f $(HL_SCRIPT) -H http://127.0.0.1:8000
+
+task-executor-wrapper:
+	cd $(SCRIPTS_DIR) && MERGED_CONFIGS_FILE=$(MERGED_CONFIGS_FILE) ROOT_DIR=$(ROOT_DIR) $(SCRIPTS_VENV_FLASK) --app task_executor_wrapper run
