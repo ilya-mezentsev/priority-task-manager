@@ -21,6 +21,7 @@ func MakeServices(db *sqlx.DB) Services {
 		taskCountMetricsService: metrics.MakeTaskCountService(
 			repositories.InQueueTaskCountRepository(),
 			repositories.InProgressTaskCountRepository(),
+			repositories.CompletedCountRepository(),
 		),
 
 		queueWaitingTimeService: metrics.MustMakeQueueWaitingTimeService(
@@ -35,6 +36,7 @@ func (ss Services) StartObserveMetrics() {
 	targets := map[string]func() error{
 		"update_in_progress_tasks_count": ss.taskCountMetricsService.UpdateInProgress,
 		"update_queued_tasks_count":      ss.taskCountMetricsService.UpdateQueued,
+		"update_completed_tasks_count":   ss.taskCountMetricsService.UpdateCompleted,
 		"update_queue_waiting_time":      ss.queueWaitingTimeService.UpdateForEachRole,
 	}
 

@@ -14,20 +14,27 @@ var (
 	tasksInProgressCount = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "tasks_in_progress_count",
 	})
+
+	completedTaskCount = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "completed_tasks_count",
+	})
 )
 
 type TaskCountService struct {
 	inQueueTaskCountRepository    repositories.NoKeyReader[uint]
 	inProgressTaskCountRepository repositories.NoKeyReader[uint]
+	completedTaskCountRepository  repositories.NoKeyReader[uint]
 }
 
 func MakeTaskCountService(
 	inQueueTaskCountRepository repositories.NoKeyReader[uint],
 	inProgressTaskCountRepository repositories.NoKeyReader[uint],
+	completedTaskCountRepository repositories.NoKeyReader[uint],
 ) TaskCountService {
 	return TaskCountService{
 		inQueueTaskCountRepository:    inQueueTaskCountRepository,
 		inProgressTaskCountRepository: inProgressTaskCountRepository,
+		completedTaskCountRepository:  completedTaskCountRepository,
 	}
 }
 
@@ -49,6 +56,17 @@ func (tcs TaskCountService) UpdateInProgress() error {
 	}
 
 	tasksInProgressCount.Set(float64(currentTasksInProgressCount))
+
+	return nil
+}
+
+func (tcs TaskCountService) UpdateCompleted() error {
+	currentCompletedTaskCount, err := tcs.completedTaskCountRepository.Get()
+	if err != nil {
+		return err
+	}
+
+	completedTaskCount.Set(float64(currentCompletedTaskCount))
 
 	return nil
 }
