@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"priority-task-manager/shared/pkg/repositories"
 	"priority-task-manager/shared/pkg/types"
@@ -21,11 +22,27 @@ func (e Executor) Exec(task types.Task) {
 	task.Status = types.InProgressStatus
 	e.updateTaskInStorage(task)
 
-	time.Sleep(time.Second * time.Duration(task.Data["exec_time"].(float64)))
+	e.imitateWork(task)
 
 	task.Completed = time.Now()
 	task.Status = types.SuccessfullyDoneStatus
 	e.updateTaskInStorage(task)
+}
+
+func (e Executor) imitateWork(task types.Task) {
+	someBuffer := make([]string, 0)
+	done := time.After(time.Second * time.Duration(task.Data["exec_time"].(float64)))
+	for {
+		select {
+		case <-done:
+			return
+		default:
+			for i := 0; i < 1000; i++ {
+				someBuffer = append(someBuffer, uuid.New().String())
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
 }
 
 func (e Executor) updateTaskInStorage(task types.Task) {
