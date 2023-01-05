@@ -96,10 +96,10 @@ class StagesShape(LoadTestShape):
 
     stages: Sequence[Mapping[str, int]] = [
         {'duration': 30, 'users': 30, 'spawn_rate': 10},
-        {'duration': 210, 'users': 90, 'spawn_rate': 10},
-        {'duration': 450, 'users': 180, 'spawn_rate': 10},
-        {'duration': 630, 'users': 90, 'spawn_rate': 10},
-        {'duration': 660, 'users': 30, 'spawn_rate': 5},
+        {'duration': 330, 'users': 90, 'spawn_rate': 10},
+        {'duration': 630, 'users': 180, 'spawn_rate': 10},
+        {'duration': 930, 'users': 90, 'spawn_rate': 10},
+        {'duration': 1230, 'users': 30, 'spawn_rate': 5},
     ]
     stop_at_end = True
 

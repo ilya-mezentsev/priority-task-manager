@@ -12,16 +12,20 @@ import json
 import os
 from typing import Mapping
 
-from flask import Flask
+from flask import Flask, request
 from flask_httpauth import HTTPBasicAuth
+
+
+queue_increase_alert_names = frozenset({
+    'QueueSmallIncrease',
+    'QueueMediumIncrease',
+    'QueueDamnIncrease',
+})
 
 
 root_dir = os.environ.get('ROOT_DIR')
 merged_configs_file = os.environ.get('MERGED_CONFIGS_FILE')
-assert (
-    merged_configs_file and root_dir,
-    'Unable to work without MERGED_CONFIGS_FILE and ROOT_DIR in env'
-)
+assert merged_configs_file and root_dir, 'Unable to work without MERGED_CONFIGS_FILE and ROOT_DIR in env'
 
 with open(merged_configs_file, 'r') as f:
     content = json.loads(f.read())
@@ -34,7 +38,7 @@ auth = HTTPBasicAuth()
 
 
 def start_task_executor(workers_count: int) -> None:
-    os.system(f'WORKERS_COUNT={workers_count} make -C {root_dir} executor-run > ./logs 2>&1 &')
+    os.system(f'WORKERS_COUNT={workers_count} make -C {root_dir} executor-run > {root_dir}/scripts/logs 2>&1 &')
 
 
 @auth.verify_password
@@ -46,8 +50,40 @@ def verify_password(username, password):
         return username
 
 
-@app.route('/alert')
+@app.route('/alert', methods=['POST'])
 @auth.login_required
 def hello_world():
-    start_task_executor(42)
+    global current_workers_count
+
+    alert = request.json['alerts'][0]
+    alert_name = alert["labels"]["alertname"]
+    if alert_name == 'QueueIncrease':
+        should_increase = True
+        coefficient = alert['annotations']['queue_increase_coefficient']
+    elif alert_name == 'QueueDecrease':
+        should_increase = False
+        coefficient = alert['annotations']['queue_decrease_coefficient']
+    else:
+        raise RuntimeError(f'Unknown alert name: {alert_name}')
+
+    if should_increase:
+        current_workers_count *= 2
+    else:
+        current_workers_count = int(current_workers_count / 2)
+
+    app.logger.info(
+        f'Got alert {alert["labels"]["alertname"]} with coefficient: {coefficient}; '
+        f'trying to start {current_workers_count} workers'
+    )
+
+    start_task_executor(current_workers_count)
+
     return 'ok'
+
+
+if __name__ == '__main__':
+    app.run(
+        host='0.0.0.0',
+        port=5000,
+        debug=True,
+    )

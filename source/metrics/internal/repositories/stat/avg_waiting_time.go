@@ -26,6 +26,18 @@ const (
 		from task_stat
 		where (select role from account where hash = account_hash) = $1
 	`
+
+	avgCompleteWaitingTimeQuery = `
+		select
+			avg(
+				extract(epoch from (completed::timestamp - extracted_from_queue::timestamp))
+			)
+		from task_stat
+		where
+			extracted_from_queue is not null and
+			completed is not null and
+			(select role from account where hash = account_hash) = $1
+	`
 )
 
 type AvgWaitingTimeRepository struct {
@@ -44,6 +56,13 @@ func MakeAvgQueuedWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository {
 	return AvgWaitingTimeRepository{
 		db:    db,
 		query: avgExtractedWaitingTimeQuery,
+	}
+}
+
+func MakeAvgCompleteWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository {
+	return AvgWaitingTimeRepository{
+		db:    db,
+		query: avgCompleteWaitingTimeQuery,
 	}
 }
 

@@ -1,0 +1,16 @@
+groups:
+  - name: queue-increase
+    rules:
+      - alert: QueueIncrease
+        expr: avg(deriv(tasks_in_queue_count[10s])) / avg(tasks_in_progress_count) / avg(complete_waiting_time_sum / complete_waiting_time_count) > 0
+        annotations:
+          summary: Queue increase coefficient
+          queue_increase_coefficient: "{{ $value }}"
+
+  - name: queue-decrease
+    rules:
+      - alert: QueueDecrease
+        expr: avg(deriv(tasks_in_queue_count[10s])) / avg(tasks_in_progress_count) / avg(complete_waiting_time_sum / complete_waiting_time_count) < 0
+        annotations:
+          summary: Queue decrease coefficient
+          queue_decrease_coefficient: "{{ $value }}"

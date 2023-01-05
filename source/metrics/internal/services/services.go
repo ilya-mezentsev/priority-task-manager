@@ -11,7 +11,7 @@ import (
 
 type Services struct {
 	taskCountMetricsService metrics.TaskCountService
-	queueWaitingTimeService metrics.QueueWaitingTimeService
+	queueWaitingTimeService metrics.WaitingTimeService
 }
 
 func MakeServices(db *sqlx.DB) Services {
@@ -24,10 +24,11 @@ func MakeServices(db *sqlx.DB) Services {
 			repositories.CompletedCountRepository(),
 		),
 
-		queueWaitingTimeService: metrics.MustMakeQueueWaitingTimeService(
+		queueWaitingTimeService: metrics.MustMakeWaitingTimeService(
 			repositories.UniqueRolesRepository(),
 			repositories.AvgExtractedWaitingTimeRepository(),
 			repositories.AvgQueuedWaitingTimeRepository(),
+			repositories.AvgCompletedWaitingTimeRepository(),
 		),
 	}
 }
@@ -37,7 +38,7 @@ func (ss Services) StartObserveMetrics() {
 		"update_in_progress_tasks_count": ss.taskCountMetricsService.UpdateInProgress,
 		"update_queued_tasks_count":      ss.taskCountMetricsService.UpdateQueued,
 		"update_completed_tasks_count":   ss.taskCountMetricsService.UpdateCompleted,
-		"update_queue_waiting_time":      ss.queueWaitingTimeService.UpdateForEachRole,
+		"update_all_waiting_time":        ss.queueWaitingTimeService.UpdateForEachRole,
 	}
 
 	for {

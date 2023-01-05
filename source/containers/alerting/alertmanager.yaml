@@ -1,0 +1,21 @@
+route:
+  receiver: "queue-growth-receiver"
+  # тут имеет смысл сделать интервалы небольшими, чтобы получать больше инфы в приложении
+  group_wait: 1s
+  repeat_interval: 5s
+  group_interval: 5s
+
+receivers:
+  - name: "queue-growth-receiver"
+    webhook_configs:
+      - url: "http://0.0.0.0:5000/alert"
+        http_config:
+          basic_auth:
+            username: "internal-user"
+            password: "internal-password"
+
+inhibit_rules:
+  - source_matchers: # to be muted
+    - alertname = QueueDecrease
+  - target_matchers: # muting take effect if match exists
+    - alertname = QueueIncrease

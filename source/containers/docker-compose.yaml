@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:latest
     ports:
-      - "5555:5432"
+      - '5555:5432'
     environment:
       TZ: Europe/Moscow
       POSTGRES_USER: task-manager
@@ -22,7 +22,7 @@ services:
       - '15672:15672'
 
   redis:
-    image: "redis:alpine"
+    image: 'redis:alpine'
     ports:
       - '6379:6379'
 
@@ -33,11 +33,22 @@ services:
     ports:
       - '8080:8080'
 
+  alertmanager:
+    build:
+      context: ./alerting/
+    command:
+      - '--config.file=/etc/prometheus/alertmanager.yaml'
+    network_mode: 'host'
+    ports:
+      - '9093:9093'
+
   prometheus:
     build:
       context: ./monitoring/
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
     network_mode: 'host'
+    depends_on:
+      - alertmanager
     ports:
       - '9090:9090'
