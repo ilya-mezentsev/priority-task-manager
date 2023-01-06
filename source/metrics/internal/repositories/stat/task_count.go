@@ -3,6 +3,7 @@ package stat
 import "github.com/jmoiron/sqlx"
 
 const (
+	generalCountQuery    = `select count(*) from task_stat`
 	inQueueCountQuery    = `select count(*) from task_stat where extracted_from_queue is null`
 	inProgressCountQuery = `select count(*) from task_stat where extracted_from_queue is not null and completed is null`
 	completedCountQuery  = `select count(*) from task_stat where completed is not null`
@@ -11,6 +12,13 @@ const (
 type TaskCountRepository struct {
 	db    *sqlx.DB
 	query string
+}
+
+func MakeGeneralCountRepository(db *sqlx.DB) TaskCountRepository {
+	return TaskCountRepository{
+		db:    db,
+		query: generalCountQuery,
+	}
 }
 
 func MakeInQueueCountRepository(db *sqlx.DB) TaskCountRepository {

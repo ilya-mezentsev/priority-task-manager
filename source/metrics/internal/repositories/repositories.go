@@ -8,6 +8,7 @@ import (
 )
 
 type Repositories struct {
+	generalTaskCountRepository        repositories.NoKeyReader[uint]
 	inQueueTaskCountRepository        repositories.NoKeyReader[uint]
 	inProgressTaskCountRepository     repositories.NoKeyReader[uint]
 	completedTaskCountRepository      repositories.NoKeyReader[uint]
@@ -19,6 +20,7 @@ type Repositories struct {
 
 func MakeRepositories(db *sqlx.DB) Repositories {
 	return Repositories{
+		generalTaskCountRepository:        stat.MakeGeneralCountRepository(db),
 		inQueueTaskCountRepository:        stat.MakeInQueueCountRepository(db),
 		inProgressTaskCountRepository:     stat.MakeInProgressCountRepository(db),
 		completedTaskCountRepository:      stat.MakeCompletedCountRepository(db),
@@ -27,6 +29,10 @@ func MakeRepositories(db *sqlx.DB) Repositories {
 		avgQueuedWaitingTimeRepository:    stat.MakeAvgQueuedWaitingTimeRepository(db),
 		avgCompletedWaitingTimeRepository: stat.MakeAvgCompleteWaitingTimeRepository(db),
 	}
+}
+
+func (r Repositories) GeneralTaskCountRepository() repositories.NoKeyReader[uint] {
+	return r.generalTaskCountRepository
 }
 
 func (r Repositories) InQueueTaskCountRepository() repositories.NoKeyReader[uint] {
