@@ -15,6 +15,7 @@ type Repositories struct {
 	avgExtractedWaitingTimeRepository repositories.Reader[float64, types.Role]
 	avgQueuedWaitingTimeRepository    repositories.Reader[float64, types.Role]
 	avgCompletedWaitingTimeRepository repositories.Reader[float64, types.Role]
+	statExistenceRepository           repositories.NoKeyReader[bool]
 	uniqueRolesRepository             repositories.NoKeyReader[[]types.Role]
 }
 
@@ -27,6 +28,7 @@ func MakeRepositories(db *sqlx.DB) Repositories {
 		avgExtractedWaitingTimeRepository: stat.MakeAvgExtractedWaitingTimeRepository(db),
 		avgQueuedWaitingTimeRepository:    stat.MakeAvgQueuedWaitingTimeRepository(db),
 		avgCompletedWaitingTimeRepository: stat.MakeAvgCompleteWaitingTimeRepository(db),
+		statExistenceRepository:           stat.MakeExistenceRepository(db),
 		uniqueRolesRepository:             MakeUniqueRolesRepository(db),
 	}
 }
@@ -57,6 +59,10 @@ func (r Repositories) AvgQueuedWaitingTimeRepository() repositories.Reader[float
 
 func (r Repositories) AvgCompletedWaitingTimeRepository() repositories.Reader[float64, types.Role] {
 	return r.avgCompletedWaitingTimeRepository
+}
+
+func (r Repositories) StatExistenceRepository() repositories.NoKeyReader[bool] {
+	return r.statExistenceRepository
 }
 
 func (r Repositories) UniqueRolesRepository() repositories.NoKeyReader[[]types.Role] {

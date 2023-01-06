@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	repositoriesConstructor "priority-task-manager/metrics/internal/repositories"
 	"priority-task-manager/metrics/internal/services/metrics"
+	"priority-task-manager/shared/pkg/repositories"
 	"priority-task-manager/shared/pkg/types"
 	"sync"
 	"time"
@@ -12,32 +13,34 @@ import (
 
 type Services struct {
 	uniqueRoles             []types.Role
+	statExistenceRepository repositories.NoKeyReader[bool]
 	taskCountMetricsService metrics.TaskCountService
 	queueWaitingTimeService metrics.WaitingTimeService
 }
 
 func MakeServices(db *sqlx.DB) Services {
-	repositories := repositoriesConstructor.MakeRepositories(db)
+	repos := repositoriesConstructor.MakeRepositories(db)
 
-	uniqueRolesRepository := repositories.UniqueRolesRepository()
+	uniqueRolesRepository := repos.UniqueRolesRepository()
 	uniqueRoles, err := uniqueRolesRepository.Get()
 	if err != nil {
 		log.Fatalf("Unable to get unique roles: %v", err)
 	}
 
 	return Services{
-		uniqueRoles: uniqueRoles,
+		uniqueRoles:             uniqueRoles,
+		statExistenceRepository: repos.StatExistenceRepository(),
 		taskCountMetricsService: metrics.MakeTaskCountService(
-			repositories.GeneralTaskCountRepository(),
-			repositories.InQueueTaskCountRepository(),
-			repositories.InProgressTaskCountRepository(),
-			repositories.CompletedCountRepository(),
+			repos.GeneralTaskCountRepository(),
+			repos.InQueueTaskCountRepository(),
+			repos.InProgressTaskCountRepository(),
+			repos.CompletedCountRepository(),
 		),
 
 		queueWaitingTimeService: metrics.MakeWaitingTimeService(
-			repositories.AvgExtractedWaitingTimeRepository(),
-			repositories.AvgQueuedWaitingTimeRepository(),
-			repositories.AvgCompletedWaitingTimeRepository(),
+			repos.AvgExtractedWaitingTimeRepository(),
+			repos.AvgQueuedWaitingTimeRepository(),
+			repos.AvgCompletedWaitingTimeRepository(),
 		),
 	}
 }
@@ -54,6 +57,21 @@ func (ss Services) StartObserveMetrics() {
 	}
 
 	for {
+		statExists, err := ss.statExistenceRepository.Get()
+		if err != nil {
+			log.Errorf("Unable to check stat existence: %v", err)
+
+			wait()
+			continue
+		}
+
+		if !statExists {
+			log.Info("No stats for tasks, skipping metrics observing")
+
+			wait()
+			continue
+		}
+
 		var wg sync.WaitGroup
 		for key, target := range targets {
 			for _, role := range ss.uniqueRoles {
@@ -62,7 +80,7 @@ func (ss Services) StartObserveMetrics() {
 				go func(key string, role types.Role, target func(role types.Role) error) {
 					defer wg.Done()
 
-					err := target(role)
+					err = target(role)
 					if err != nil {
 						log.Errorf("Unable to exec %s: %v\n", key, err)
 					}
@@ -72,6 +90,11 @@ func (ss Services) StartObserveMetrics() {
 
 		wg.Wait()
 
-		time.Sleep(time.Second * 2)
+		wait()
 	}
+}
+
+func wait() {
+	// просто не хочется копиастить эти 2 секунды в 3 места
+	time.Sleep(time.Second * 2)
 }
