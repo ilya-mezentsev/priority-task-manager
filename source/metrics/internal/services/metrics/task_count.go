@@ -4,38 +4,39 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"priority-task-manager/shared/pkg/repositories"
+	"priority-task-manager/shared/pkg/types"
 )
 
 var (
-	generalTasksCount = promauto.NewGauge(prometheus.GaugeOpts{
+	generalTasksCount = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "general_tasks_count",
-	})
+	}, []string{"role"})
 
-	tasksInQueueCount = promauto.NewGauge(prometheus.GaugeOpts{
+	tasksInQueueCount = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "tasks_in_queue_count",
-	})
+	}, []string{"role"})
 
-	tasksInProgressCount = promauto.NewGauge(prometheus.GaugeOpts{
+	tasksInProgressCount = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "tasks_in_progress_count",
-	})
+	}, []string{"role"})
 
-	completedTaskCount = promauto.NewGauge(prometheus.GaugeOpts{
+	completedTaskCount = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "completed_tasks_count",
-	})
+	}, []string{"role"})
 )
 
 type TaskCountService struct {
-	generalTaskCountRepository    repositories.NoKeyReader[uint]
-	inQueueTaskCountRepository    repositories.NoKeyReader[uint]
-	inProgressTaskCountRepository repositories.NoKeyReader[uint]
-	completedTaskCountRepository  repositories.NoKeyReader[uint]
+	generalTaskCountRepository    repositories.Reader[uint, types.Role]
+	inQueueTaskCountRepository    repositories.Reader[uint, types.Role]
+	inProgressTaskCountRepository repositories.Reader[uint, types.Role]
+	completedTaskCountRepository  repositories.Reader[uint, types.Role]
 }
 
 func MakeTaskCountService(
-	generalTaskCountRepository repositories.NoKeyReader[uint],
-	inQueueTaskCountRepository repositories.NoKeyReader[uint],
-	inProgressTaskCountRepository repositories.NoKeyReader[uint],
-	completedTaskCountRepository repositories.NoKeyReader[uint],
+	generalTaskCountRepository repositories.Reader[uint, types.Role],
+	inQueueTaskCountRepository repositories.Reader[uint, types.Role],
+	inProgressTaskCountRepository repositories.Reader[uint, types.Role],
+	completedTaskCountRepository repositories.Reader[uint, types.Role],
 ) TaskCountService {
 	return TaskCountService{
 		generalTaskCountRepository:    generalTaskCountRepository,
@@ -45,46 +46,46 @@ func MakeTaskCountService(
 	}
 }
 
-func (tcs TaskCountService) UpdateGeneral() error {
-	generalTaskCount, err := tcs.generalTaskCountRepository.Get()
+func (tcs TaskCountService) UpdateGeneral(role types.Role) error {
+	generalTaskCount, err := tcs.generalTaskCountRepository.Get(role)
 	if err != nil {
 		return err
 	}
 
-	generalTasksCount.Set(float64(generalTaskCount))
+	generalTasksCount.WithLabelValues(string(role)).Set(float64(generalTaskCount))
 
 	return nil
 }
 
-func (tcs TaskCountService) UpdateQueued() error {
-	currentTasksInQueueCount, err := tcs.inQueueTaskCountRepository.Get()
+func (tcs TaskCountService) UpdateQueued(role types.Role) error {
+	currentTasksInQueueCount, err := tcs.inQueueTaskCountRepository.Get(role)
 	if err != nil {
 		return err
 	}
 
-	tasksInQueueCount.Set(float64(currentTasksInQueueCount))
+	tasksInQueueCount.WithLabelValues(string(role)).Set(float64(currentTasksInQueueCount))
 
 	return nil
 }
 
-func (tcs TaskCountService) UpdateInProgress() error {
-	currentTasksInProgressCount, err := tcs.inProgressTaskCountRepository.Get()
+func (tcs TaskCountService) UpdateInProgress(role types.Role) error {
+	currentTasksInProgressCount, err := tcs.inProgressTaskCountRepository.Get(role)
 	if err != nil {
 		return err
 	}
 
-	tasksInProgressCount.Set(float64(currentTasksInProgressCount))
+	tasksInProgressCount.WithLabelValues(string(role)).Set(float64(currentTasksInProgressCount))
 
 	return nil
 }
 
-func (tcs TaskCountService) UpdateCompleted() error {
-	currentCompletedTaskCount, err := tcs.completedTaskCountRepository.Get()
+func (tcs TaskCountService) UpdateCompleted(role types.Role) error {
+	currentCompletedTaskCount, err := tcs.completedTaskCountRepository.Get(role)
 	if err != nil {
 		return err
 	}
 
-	completedTaskCount.Set(float64(currentCompletedTaskCount))
+	completedTaskCount.WithLabelValues(string(role)).Set(float64(currentCompletedTaskCount))
 
 	return nil
 }

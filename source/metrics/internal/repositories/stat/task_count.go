@@ -1,12 +1,15 @@
 package stat
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"priority-task-manager/shared/pkg/types"
+)
 
 const (
-	generalCountQuery    = `select count(*) from task_stat`
-	inQueueCountQuery    = `select count(*) from task_stat where extracted_from_queue is null`
-	inProgressCountQuery = `select count(*) from task_stat where extracted_from_queue is not null and completed is null`
-	completedCountQuery  = `select count(*) from task_stat where completed is not null`
+	generalCountQuery    = `select count(*) from task_stat where (select role from account where hash = account_hash) = $1`
+	inQueueCountQuery    = `select count(*) from task_stat where extracted_from_queue is null and (select role from account where hash = account_hash) = $1`
+	inProgressCountQuery = `select count(*) from task_stat where extracted_from_queue is not null and completed is null and (select role from account where hash = account_hash) = $1`
+	completedCountQuery  = `select count(*) from task_stat where completed is not null and (select role from account where hash = account_hash) = $1`
 )
 
 type TaskCountRepository struct {
@@ -42,9 +45,9 @@ func MakeCompletedCountRepository(db *sqlx.DB) TaskCountRepository {
 	}
 }
 
-func (tc TaskCountRepository) Get() (uint, error) {
+func (tc TaskCountRepository) Get(role types.Role) (uint, error) {
 	var count uint
-	err := tc.db.Get(&count, tc.query)
+	err := tc.db.Get(&count, tc.query, string(role))
 
 	return count, err
 }
