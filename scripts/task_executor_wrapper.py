@@ -23,6 +23,7 @@ queue_increase_alert_names = frozenset({
 })
 
 
+minimum_workers_count = 30
 root_dir = os.environ.get('ROOT_DIR')
 merged_configs_file = os.environ.get('MERGED_CONFIGS_FILE')
 assert merged_configs_file and root_dir, 'Unable to work without MERGED_CONFIGS_FILE and ROOT_DIR in env'
@@ -76,6 +77,8 @@ def hello_world():
             if should_increase
             else int(current_workers_count / 2)
         )
+
+        current_workers_count = max(minimum_workers_count, current_workers_count)
 
         app.logger.info(
             f'Got alert {alert["labels"]["alertname"]} with coefficient: {coefficient}; '

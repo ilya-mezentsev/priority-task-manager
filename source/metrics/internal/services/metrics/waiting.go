@@ -62,7 +62,7 @@ func (queueWaitingTimeService WaitingTimeService) UpdateForEachRole() error {
 			queueWaitingTimeService.updateQueuedForRole,
 			queueWaitingTimeService.updateCompleteForRole,
 		}
-		errors = make(chan error, len(queueWaitingTimeService.uniqueRoles))
+		errors = make(chan error, len(queueWaitingTimeService.uniqueRoles)*len(updaters))
 	)
 
 	for _, role := range queueWaitingTimeService.uniqueRoles {
