@@ -60,23 +60,29 @@ def hello_world():
     if alert_name == 'QueueIncrease':
         should_increase = True
         coefficient = alert['annotations']['queue_increase_coefficient']
+        coefficient = float(coefficient) if coefficient else 0
     elif alert_name == 'QueueDecrease':
         should_increase = False
         coefficient = alert['annotations']['queue_decrease_coefficient']
+        coefficient = float(coefficient) if coefficient else 0
     else:
         raise RuntimeError(f'Unknown alert name: {alert_name}')
 
-    if should_increase:
-        current_workers_count *= 2
-    else:
-        current_workers_count = int(current_workers_count / 2)
+    # если получили "значимый" коэффициент
+    if round(coefficient, 1):
+        # todo тут по-хорошему надо использовать значение коэффициента
+        current_workers_count = (
+            current_workers_count * 2
+            if should_increase
+            else int(current_workers_count / 2)
+        )
 
-    app.logger.info(
-        f'Got alert {alert["labels"]["alertname"]} with coefficient: {coefficient}; '
-        f'trying to start {current_workers_count} workers'
-    )
+        app.logger.info(
+            f'Got alert {alert["labels"]["alertname"]} with coefficient: {coefficient}; '
+            f'trying to start {current_workers_count} workers'
+        )
 
-    start_task_executor(current_workers_count)
+        start_task_executor(current_workers_count)
 
     return 'ok'
 

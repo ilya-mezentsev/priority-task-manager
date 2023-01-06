@@ -37,6 +37,6 @@ func (tc TaskController) Handle(context *gin.Context) {
 		context.String(http.StatusInternalServerError, "Server got itself in trouble")
 	} else {
 		context.Header("X-Created-Task-UUID", taskUUID)
-		context.String(http.StatusOK, "OK")
+		context.String(http.StatusCreated, "OK")
 	}
 }
