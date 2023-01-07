@@ -50,7 +50,7 @@ TASK_EXECUTOR_WRAPPER_SCRIPT := $(SCRIPTS_DIR)/task_executor_wrapper.py
 GOMODCACHE = $(SHARED_DIR)/pkg/mod
 
 run: configs-merge
-	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE) go run $(ENTRYPOINT) $(MERGED_CONFIGS_FILE)
+	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE) go run -race $(ENTRYPOINT) $(MERGED_CONFIGS_FILE)
 
 tidy:
 	cd $(APP_DIR) && GOMODCACHE=$(GOMODCACHE) go mod tidy

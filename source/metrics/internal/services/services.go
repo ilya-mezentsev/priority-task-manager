@@ -80,9 +80,9 @@ func (ss Services) StartObserveMetrics() {
 				go func(key string, role types.Role, target func(role types.Role) error) {
 					defer wg.Done()
 
-					err = target(role)
-					if err != nil {
-						log.Errorf("Unable to exec %s: %v\n", key, err)
+					metricsErr := target(role)
+					if metricsErr != nil {
+						log.Errorf("Unable to exec %s: %v\n", key, metricsErr)
 					}
 				}(key, role, target)
 			}

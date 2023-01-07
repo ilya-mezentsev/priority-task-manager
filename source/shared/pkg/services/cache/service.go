@@ -3,10 +3,13 @@ package cache
 import (
 	"priority-task-manager/shared/pkg/repositories"
 	"priority-task-manager/shared/pkg/types"
+	"sync"
 	"time"
 )
 
 type Service[Model any, Key comparable] struct {
+	sync.Mutex
+
 	cacheLifetimeSeconds int
 	cache                map[Key]Cached[Model]
 
@@ -27,13 +30,13 @@ func (r *Service[Model, Key]) Get(key Key) (Model, error) {
 	now := time.Now()
 	currentTs := now.Unix()
 
-	cached, found := r.cache[key]
+	cached, found := r.get(key)
 	if found {
 		// кеш еще не протух
 		if int(cached.cachedTs-currentTs) < r.cacheLifetimeSeconds {
 			return cached.value, nil
 		} else {
-			delete(r.cache, key)
+			r.delete(key)
 			return r.Get(key)
 		}
 	} else {
@@ -42,13 +45,36 @@ func (r *Service[Model, Key]) Get(key Key) (Model, error) {
 			return zeroResult, err
 		}
 
-		r.cache[key] = Cached[Model]{
+		r.set(key, Cached[Model]{
 			value:    model,
 			cachedTs: currentTs,
-		}
+		})
 
 		return model, nil
 	}
+}
+
+func (r *Service[Model, Key]) set(key Key, value Cached[Model]) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.cache[key] = value
+}
+
+func (r *Service[Model, Key]) get(key Key) (Cached[Model], bool) {
+	r.Lock()
+	defer r.Unlock()
+
+	value, found := r.cache[key]
+
+	return value, found
+}
+
+func (r *Service[Model, Key]) delete(key Key) {
+	r.Lock()
+	defer r.Unlock()
+
+	delete(r.cache, key)
 }
 
 func (r *Service[Model, Key]) Add(entity Model) error {
@@ -57,6 +83,9 @@ func (r *Service[Model, Key]) Add(entity Model) error {
 }
 
 func (r *Service[Model, Key]) clear() {
+	r.Lock()
+	defer r.Unlock()
+
 	r.cache = map[Key]Cached[Model]{}
 }
 
