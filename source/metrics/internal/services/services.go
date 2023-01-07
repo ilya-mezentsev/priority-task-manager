@@ -47,13 +47,13 @@ func MakeServices(db *sqlx.DB) Services {
 
 func (ss Services) StartObserveMetrics() {
 	targets := map[string]func(role types.Role) error{
-		"update_general_tasks_count":       ss.taskCountMetricsService.UpdateGeneral,
-		"update_in_progress_tasks_count":   ss.taskCountMetricsService.UpdateInProgress,
-		"update_queued_tasks_count":        ss.taskCountMetricsService.UpdateQueued,
-		"update_completed_tasks_count":     ss.taskCountMetricsService.UpdateCompleted,
-		"update_extracting_waiting_time":   ss.queueWaitingTimeService.UpdateExtracted,
-		"update_in_queue_waiting_time":     ss.queueWaitingTimeService.UpdateQueued,
-		"update_in_completed_waiting_time": ss.queueWaitingTimeService.UpdateComplete,
+		"update_general_tasks_count":     ss.taskCountMetricsService.UpdateGeneral,
+		"update_in_progress_tasks_count": ss.taskCountMetricsService.UpdateInProgress,
+		"update_queued_tasks_count":      ss.taskCountMetricsService.UpdateQueued,
+		"update_completed_tasks_count":   ss.taskCountMetricsService.UpdateCompleted,
+		"update_extracting_waiting_time": ss.queueWaitingTimeService.UpdateExtracted,
+		"update_in_queue_waiting_time":   ss.queueWaitingTimeService.UpdateQueued,
+		"update_complete_waiting_time":   ss.queueWaitingTimeService.UpdateComplete,
 	}
 
 	for {

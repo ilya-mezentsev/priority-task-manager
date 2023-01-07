@@ -3,11 +3,27 @@ route:
   group_wait: 1s
   repeat_interval: 15s
   group_interval: 15s
+  routes:
+    - receiver: "queue-growth-receiver"
+      matchers:
+        - alertname =~ "QueueIncrease|QueueDecrease"
+
+    - receiver: "in-queue-waiting-time-receiver"
+      matchers:
+        - alertname = WaitingTooLong
 
 receivers:
   - name: "queue-growth-receiver"
     webhook_configs:
       - url: "http://0.0.0.0:5000/alert"
+        http_config:
+          basic_auth:
+            username: "internal-user"
+            password: "internal-password"
+
+  - name: "in-queue-waiting-time-receiver"
+    webhook_configs:
+      - url: "http://0.0.0.0:8000/internal/alert"
         http_config:
           basic_auth:
             username: "internal-user"

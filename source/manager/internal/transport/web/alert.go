@@ -2,19 +2,21 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"priority-task-manager/manager/internal/services/permission"
+	"strconv"
 )
 
 type (
 	Alert struct {
 		Annotations struct {
-			LatencySeconds float64 `json:"latency_seconds"`
+			WaitingTime string `json:"waiting_time"`
 		} `json:"annotations"`
 	}
 
 	AlertRequest struct {
-		Alters []Alert `json:"alters"`
+		Alerts []Alert `json:"alerts"`
 	}
 )
 
@@ -29,12 +31,20 @@ func makeAlertController(service *permission.VersionManager) AlertController {
 func (ac AlertController) Handle(context *gin.Context) {
 	var r AlertRequest
 	if err := context.ShouldBindJSON(&r); err != nil {
+		log.Errorf("Unable to parse alert: %v", err)
 		context.String(http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 
-	for _, alert := range r.Alters {
-		ac.service.UpdateVersionId(alert.Annotations.LatencySeconds)
+	for _, alert := range r.Alerts {
+		waitingTimer, err := strconv.ParseFloat(alert.Annotations.WaitingTime, 10)
+		if err != nil {
+			log.Errorf("Unable to parse waiting time (%s) in alert: %v", alert.Annotations.WaitingTime, err)
+			context.String(http.StatusBadRequest, "Invalid waiting time in alert")
+			continue
+		}
+
+		ac.service.UpdateVersionId(waitingTimer)
 	}
 
 	context.String(http.StatusOK, "OK")

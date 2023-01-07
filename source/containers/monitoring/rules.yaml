@@ -14,3 +14,12 @@ groups:
         annotations:
           summary: Queue decrease coefficient
           queue_decrease_coefficient: "{{ $value }}"
+
+  - name: waiting-too-long
+    rules:
+      - alert: WaitingTooLong
+        expr: predict_linear(extracted_tasks_waiting_time{role="role-1"}[10s], 10) > 30
+        for: 1m
+        annotations:
+          summary: Tasks from account with role role-1 is waiting too long
+          waiting_time: "{{ $value }}"

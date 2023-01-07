@@ -43,6 +43,7 @@ services:
       - '9093:9093'
 
   prometheus:
+    tty: false
     build:
       context: ./monitoring/
     command:
