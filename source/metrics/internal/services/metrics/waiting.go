@@ -8,15 +8,15 @@ import (
 )
 
 var (
-	extractedFromQueueWaitingTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
+	extractedFromQueueWaitingTime = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "extracted_tasks_waiting_time",
 	}, []string{"role"})
 
-	queuedWaitingTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
+	queuedWaitingTime = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "queued_tasks_waiting_time",
 	}, []string{"role"})
 
-	completeWaitingTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
+	completeWaitingTime = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "complete_waiting_time",
 	}, []string{"role"})
 )
@@ -46,7 +46,7 @@ func (queueWaitingTimeService WaitingTimeService) UpdateExtracted(role types.Rol
 		return err
 	}
 
-	extractedFromQueueWaitingTime.WithLabelValues(string(role)).Observe(extractedTaskWaitingTime)
+	extractedFromQueueWaitingTime.WithLabelValues(string(role)).Set(extractedTaskWaitingTime)
 
 	return nil
 }
@@ -57,7 +57,7 @@ func (queueWaitingTimeService WaitingTimeService) UpdateQueued(role types.Role) 
 		return err
 	}
 
-	queuedWaitingTime.WithLabelValues(string(role)).Observe(queuedTaskWaitingTime)
+	queuedWaitingTime.WithLabelValues(string(role)).Set(queuedTaskWaitingTime)
 
 	return nil
 }
@@ -68,7 +68,7 @@ func (queueWaitingTimeService WaitingTimeService) UpdateComplete(role types.Role
 		return err
 	}
 
-	completeWaitingTime.WithLabelValues(string(role)).Observe(completeTaskWaitingTime)
+	completeWaitingTime.WithLabelValues(string(role)).Set(completeTaskWaitingTime)
 
 	return nil
 }

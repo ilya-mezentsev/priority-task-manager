@@ -5,7 +5,6 @@ import (
 	"priority-task-manager/shared/pkg/types"
 )
 
-//goland:noinspection all
 const (
 	avgExtractedWaitingTimeQuery = `
 		select
@@ -55,7 +54,7 @@ func MakeAvgExtractedWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository
 func MakeAvgQueuedWaitingTimeRepository(db *sqlx.DB) AvgWaitingTimeRepository {
 	return AvgWaitingTimeRepository{
 		db:    db,
-		query: avgExtractedWaitingTimeQuery,
+		query: avgQueuedWaitingTimeQuery,
 	}
 }
 
