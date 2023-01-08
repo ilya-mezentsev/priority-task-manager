@@ -6,15 +6,7 @@
   "load_levels": [
     {
       "version_id": "default",
-      "max_latency": 0.7
-    },
-    {
-      "version_id": "medium-load",
-      "max_latency": 1.4
-    },
-    {
-      "version_id": "high-load",
-      "max_latency": 2.1
+      "max_latency": 30
     }
   ],
   "default_version_id": "default",

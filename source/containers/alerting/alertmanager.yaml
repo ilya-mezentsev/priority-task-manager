@@ -6,11 +6,11 @@ route:
   routes:
     - receiver: "queue-growth-receiver"
       matchers:
-        - alertname =~ "QueueIncrease|QueueDecrease"
+        - alertname =~ "QueueIncrease|QueueDecrease|HighPriorityWaitingTooLong"
 
     - receiver: "in-queue-waiting-time-receiver"
       matchers:
-        - alertname = WaitingTooLong
+        - alertname =~ "WaitingTooLong|WaitingOk"
 
 receivers:
   - name: "queue-growth-receiver"
@@ -33,4 +33,4 @@ inhibit_rules:
   - source_matchers: # to be muted
     - alertname = QueueDecrease
   - target_matchers: # muting take effect if match exists
-    - alertname = QueueIncrease
+    - alertname =~ "QueueIncrease|HighPriorityWaitingTooLong"

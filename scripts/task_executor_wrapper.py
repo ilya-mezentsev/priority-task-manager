@@ -10,7 +10,7 @@
 
 import json
 import os
-from typing import Mapping
+from typing import Mapping, Optional
 
 from flask import Flask, request
 from flask_httpauth import HTTPBasicAuth
@@ -58,7 +58,9 @@ def hello_world():
     global current_workers_count
 
     alert = request.json['alerts'][0]
-    alert_name = alert["labels"]["alertname"]
+    workers_count = alert['annotations'].get('workers_count')
+    alert_name = alert['labels']['alertname']
+    use_max_workers_limit = True
     if alert_name == 'QueueIncrease':
         should_increase = True
         coefficient = alert['annotations']['queue_increase_coefficient']
@@ -67,23 +69,35 @@ def hello_world():
         should_increase = False
         coefficient = alert['annotations']['queue_decrease_coefficient']
         coefficient = float(coefficient) if coefficient else 0
+    elif alert_name == 'HighPriorityWaitingTooLong':
+        should_increase = True
+        use_max_workers_limit = False
+        coefficient = 0.1
     else:
         raise RuntimeError(f'Unknown alert name: {alert_name}')
 
+    new_workers_count: Optional[int] = None
     # если получили "значимый" коэффициент
     if round(coefficient, 1):
-        # todo тут по-хорошему надо использовать значение коэффициента
-        current_workers_count = (
+        # todo тут по-хорошему надо использовать значение коэффициента;
+        # например, увеличивать/уменьшать кол-во воркеров в 1/coefficient раз
+        new_workers_count = (
             current_workers_count * 2
             if should_increase
             else int(current_workers_count / 2)
         )
 
-        current_workers_count = max(min_workers_count, current_workers_count)
-        current_workers_count = min(max_workers_count, current_workers_count)
+        new_workers_count = max(min_workers_count, new_workers_count)
+        new_workers_count = (
+            min(max_workers_count, new_workers_count)
+            if use_max_workers_limit
+            else int(max_workers_count * 1.5)
+        )
 
+    if new_workers_count is not None and new_workers_count != current_workers_count:
+        current_workers_count = new_workers_count
         app.logger.info(
-            f'Got alert {alert["labels"]["alertname"]} with coefficient: {coefficient}; '
+            f'Got alert {alert_name} with coefficient: {coefficient} (passed {workers_count} workers count); '
             f'trying to start {current_workers_count} workers'
         )
 

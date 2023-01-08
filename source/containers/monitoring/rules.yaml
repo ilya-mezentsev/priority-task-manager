@@ -6,6 +6,8 @@ groups:
         annotations:
           summary: Queue increase coefficient
           queue_increase_coefficient: "{{ $value }}"
+          # todo это бы починить
+#          workers_count: foo - {{ with query "sum(tasks_in_progress_count)" }}
 
   - name: queue-decrease
     rules:
@@ -14,12 +16,34 @@ groups:
         annotations:
           summary: Queue decrease coefficient
           queue_decrease_coefficient: "{{ $value }}"
+          # todo это бы починить
+#          workers_count: foo - {{ with query "sum(tasks_in_progress_count)" }}
 
   - name: waiting-too-long
     rules:
       - alert: WaitingTooLong
-        expr: predict_linear(extracted_tasks_waiting_time{role="role-1"}[10s], 10) > 30
+        expr: deriv(completed_tasks_count{role="role-1"}[10s]) < 1
         for: 1m
         annotations:
           summary: Tasks from account with role role-1 is waiting too long
+          waiting_time: 60
+
+  - name: waiting-ok
+    rules:
+      - alert: WaitingOk
+        expr: deriv(completed_tasks_count{role="role-1"}[10s]) > 0
+        for: 1m
+        annotations:
+          summary: Tasks from account with role role-1 is waiting ok
+          waiting_time: 15
+
+  - name: high-priority-waiting-too-long
+    rules:
+      - alert: HighPriorityWaitingTooLong
+        expr: predict_linear(extracted_tasks_waiting_time{role="role-3"}[10s], 10) > 20
+        for: 1m
+        annotations:
+          summary: Tasks from account with role role-3 is waiting too long
           waiting_time: "{{ $value }}"
+          # todo это бы починить
+#          workers_count: foo - {{ with query "sum(tasks_in_progress_count)" }}
