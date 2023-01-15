@@ -37,7 +37,7 @@ func (m *MockPermissionResolver) Get(key permission.ResolveRequest) (bool, error
 func TestService_DetermineMaxPriority_Success(t *testing.T) {
 	service := regularService()
 
-	priority, err := service.DetermineMaxPriority("role-1")
+	priority, err := service.DetermineMaxPriority("bronze-client")
 	assert.Nil(t, err)
 	assert.Equal(t, 100, priority)
 	assert.Equal(t, "priority-100", service.permissionResolver.(*MockPermissionResolver).calledWithPriorityKey)

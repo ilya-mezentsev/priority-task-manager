@@ -9,9 +9,9 @@ CREATE TABLE account(
 
 INSERT INTO account(hash, role)
 VALUES
-    ('86d3f3a95c324c9479bd8986968f4327', 'role-1'),
-    ('11c9beec53034beb3a6687891c9e248a', 'role-2'),
-    ('eafae37058a254f5dfdfe22ede8cca1f', 'role-3');
+    ('86d3f3a95c324c9479bd8986968f4327', 'bronze-client'),
+    ('11c9beec53034beb3a6687891c9e248a', 'silver-client'),
+    ('eafae37058a254f5dfdfe22ede8cca1f', 'gold-client');
 
 DROP TABLE IF EXISTS task_stat;
 CREATE TABLE task_stat(

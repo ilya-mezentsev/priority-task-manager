@@ -144,7 +144,7 @@
     ],
     "roles": [
         {
-            "id": "role-1",
+            "id": "bronze-client",
             "versionId": "default",
             "title": "",
             "permissions": [
@@ -156,7 +156,7 @@
             "extends": null
         },
         {
-            "id": "role-2",
+            "id": "silver-client",
             "versionId": "default",
             "title": "",
             "permissions": [
@@ -168,7 +168,7 @@
             "extends": null
         },
         {
-            "id": "role-3",
+            "id": "gold-client",
             "versionId": "default",
             "title": "",
             "permissions": [
@@ -180,25 +180,25 @@
             "extends": null
         },
         {
-            "id": "role-2",
+            "id": "silver-client",
             "versionId": "damn-load",
             "title": "",
             "permissions": null,
             "extends": [
-                "role-1"
+                "bronze-client"
             ]
         },
         {
-            "id": "role-3",
+            "id": "gold-client",
             "versionId": "damn-load",
             "title": "",
             "permissions": null,
             "extends": [
-                "role-1"
+                "bronze-client"
             ]
         },
         {
-            "id": "role-1",
+            "id": "bronze-client",
             "versionId": "damn-load",
             "title": "",
             "permissions": [

@@ -24,28 +24,28 @@ groups:
   - name: waiting-too-long
     rules:
       - alert: WaitingTooLong
-        expr: deriv(completed_tasks_count{role="role-1"}[10s]) < 1
+        expr: deriv(completed_tasks_count{role="bronze-client"}[10s]) < 1
         for: 1m
         annotations:
-          summary: Tasks from account with role role-1 is waiting too long
+          summary: Tasks from account with role bronze-client is waiting too long
           waiting_time: 60
 
   - name: waiting-ok
     rules:
       - alert: WaitingOk
-        expr: deriv(completed_tasks_count{role="role-1"}[10s]) > 0
+        expr: deriv(completed_tasks_count{role="bronze-client"}[10s]) > 0
         for: 1m
         annotations:
-          summary: Tasks from account with role role-1 is waiting ok
+          summary: Tasks from account with role bronze-client is waiting ok
           waiting_time: 15
 
   - name: high-priority-waiting-too-long
     rules:
       - alert: HighPriorityWaitingTooLong
-        expr: predict_linear(extracted_tasks_waiting_time{role="role-3"}[10s], 10) > 20
+        expr: predict_linear(extracted_tasks_waiting_time{role="gold-client"}[10s], 10) > 20
         for: 1m
         annotations:
-          summary: Tasks from account with role role-3 is waiting too long
+          summary: Tasks from account with role gold-client is waiting too long
           waiting_time: "{{ $value }}"
           # todo это бы починить
 #          workers_count: foo - {{ with query "sum(tasks_in_progress_count)" }}
