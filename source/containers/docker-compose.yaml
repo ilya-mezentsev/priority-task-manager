@@ -3,6 +3,7 @@ version: '3'
 services:
   db:
     image: postgres:latest
+    command: postgres -c 'max_connections=370'
     ports:
       - '5555:5432'
     environment:

@@ -58,7 +58,6 @@ def hello_world():
     global current_workers_count
 
     alert = request.json['alerts'][0]
-    workers_count = alert['annotations'].get('workers_count')
     alert_name = alert['labels']['alertname']
     use_max_workers_limit = True
     if alert_name == 'QueueIncrease':
@@ -97,7 +96,7 @@ def hello_world():
     if new_workers_count is not None and new_workers_count != current_workers_count:
         current_workers_count = new_workers_count
         app.logger.info(
-            f'Got alert {alert_name} with coefficient: {coefficient} (passed {workers_count} workers count); '
+            f'Got alert {alert_name} with coefficient: {coefficient}; '
             f'trying to start {current_workers_count} workers'
         )
 
