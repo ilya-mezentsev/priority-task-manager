@@ -102,6 +102,12 @@ def hello_world():
 
         start_task_executor(current_workers_count)
 
+    elif new_workers_count is None:
+        app.logger.info(f'Ignoring alert {alert_name} due to unfilled workers count')
+
+    elif new_workers_count == current_workers_count:
+        app.logger.info(f'Ignoring alert {alert_name} due to unchanged workers count {current_workers_count}')
+
     return 'ok'
 
 

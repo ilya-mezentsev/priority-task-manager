@@ -13,7 +13,10 @@ groups:
     rules:
       - alert: QueueDecrease
 #        expr: sum(deriv(general_tasks_count[10s])) / sum(deriv(completed_tasks_count[10s])) < 1
-        expr: sum(deriv(tasks_in_queue_count[10s])) / (sum(tasks_in_progress_count) / avg(complete_waiting_time)) < 0 and sum(tasks_in_queue_count) < (10 * sum(tasks_in_progress_count))
+        expr: >
+          sum(deriv(tasks_in_queue_count[10s])) / (sum(tasks_in_progress_count) / avg(complete_waiting_time)) < 0 and
+          sum(tasks_in_queue_count) < (10 * sum(tasks_in_progress_count)) and
+          predict_linear(extracted_tasks_waiting_time{role="gold-client"}[10s], 10) <= 20
         for: 1m
         annotations:
           summary: Queue decrease coefficient
@@ -31,7 +34,7 @@ groups:
   - name: waiting-ok
     rules:
       - alert: WaitingOk
-        expr: deriv(completed_tasks_count{role="bronze-client"}[10s]) > 0
+        expr: deriv(completed_tasks_count{role="bronze-client"}[10s]) > 0 or predict_linear(extracted_tasks_waiting_time{role="gold-client"}[10s], 10) > 20
         for: 1m
         annotations:
           summary: Tasks from account with role bronze-client is waiting ok
