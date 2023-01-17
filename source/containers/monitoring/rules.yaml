@@ -34,8 +34,9 @@ groups:
   - name: waiting-ok
     rules:
       - alert: WaitingOk
-#        expr: deriv(completed_tasks_count{role="bronze-client"}[10s]) > 0
-        expr: deriv(completed_tasks_count{role="bronze-client"}[10s]) > 0 or predict_linear(extracted_tasks_waiting_time{role="gold-client"}[10s], 10) > 20
+        expr: >
+          deriv(completed_tasks_count{role="bronze-client"}[10s]) > 0 or
+          predict_linear(extracted_tasks_waiting_time{role="gold-client"}[10s], 10) > 20
         for: 1m
         annotations:
           summary: Tasks from account with role bronze-client is waiting ok

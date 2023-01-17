@@ -13,10 +13,10 @@ assert len(sys.argv) == 3, f'Script can process exactly two arguments; first - i
 before_title = os.environ.get('BEFORE_TITLE') or 'Before'
 after_title = os.environ.get('AFTER_TITLE') or 'After'
 
-labels = {
+labels = [
     before_title,
     after_title,
-}
+]
 time_points_list: list[list[float]] = []
 for file in sys.argv[1:]:
     with open(file, 'r') as f:
@@ -28,7 +28,7 @@ for time_points in time_points_list:
     plt.plot(
         x_points,
         list(map(float, time_points[:min_points_count])),
-        label=labels.pop(),
+        label=labels.pop(0),
     )
 
 plt.ylabel('Время ожидания задачи взятия в работу, [с]')
