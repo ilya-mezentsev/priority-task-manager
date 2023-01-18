@@ -19,6 +19,12 @@ type (
 		CacheLifetimeSeconds int `json:"cache_lifetime_seconds"`
 	}
 
+	RedisSettings struct {
+		Address  string `json:"address"`
+		Password string `json:"password"`
+		DB       int    `json:"db"`
+	}
+
 	QueueSettings struct {
 		Name        string `json:"name"`
 		MaxPriority int    `json:"max_priority"`

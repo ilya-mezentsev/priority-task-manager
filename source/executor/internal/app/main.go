@@ -11,6 +11,7 @@ import (
 	"priority-task-manager/executor/internal/services"
 	"priority-task-manager/shared/pkg/services/db/connection"
 	myLogger "priority-task-manager/shared/pkg/services/log"
+	sharedSettings "priority-task-manager/shared/pkg/services/settings"
 	"strconv"
 	"syscall"
 )
@@ -35,6 +36,7 @@ func Main() {
 	mustStoreCurrentPid(r)
 
 	processWorkersCount(&settings)
+	mustStoreCurrentWorkersCount(r, settings.WorkersPool.MaxWorkersCount)
 
 	db := connection.MustGetConnection(settings.DB)
 	ss := services.MakeServices(settings, db)
@@ -80,7 +82,7 @@ func waitForSignal(ss services.Services) {
 	log.Info("Exiting")
 }
 
-func redisClient(redisSettings configs.RedisSettings) *redis.Client {
+func redisClient(redisSettings sharedSettings.RedisSettings) *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     redisSettings.Address,
 		Password: redisSettings.Password,
@@ -119,5 +121,12 @@ func mustStoreCurrentPid(redisClient *redis.Client) {
 	err := redisClient.Set(ctx, taskExecutorPidKey, os.Getpid(), 0).Err()
 	if err != nil {
 		log.Fatalf("Unable to store current pid to redis: %v", err)
+	}
+}
+
+func mustStoreCurrentWorkersCount(redisClient *redis.Client, count int) {
+	err := redisClient.Set(ctx, "max-workers-count", count, 0).Err()
+	if err != nil {
+		log.Fatalf("Unable to store max workers count: %v", err)
 	}
 }

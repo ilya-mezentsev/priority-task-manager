@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 	repositoriesConstructor "priority-task-manager/metrics/internal/repositories"
@@ -16,9 +17,10 @@ type Services struct {
 	statExistenceRepository repositories.NoKeyReader[bool]
 	taskCountMetricsService metrics.TaskCountService
 	queueWaitingTimeService metrics.WaitingTimeService
+	workersCountService     metrics.WorkersCountService
 }
 
-func MakeServices(db *sqlx.DB) Services {
+func MakeServices(db *sqlx.DB, redisClient *redis.Client) Services {
 	repos := repositoriesConstructor.MakeRepositories(db)
 
 	uniqueRolesRepository := repos.UniqueRolesRepository()
@@ -42,6 +44,8 @@ func MakeServices(db *sqlx.DB) Services {
 			repos.AvgQueuedWaitingTimeRepository(),
 			repos.AvgCompletedWaitingTimeRepository(),
 		),
+
+		workersCountService: metrics.MakeWorkersCountService(redisClient),
 	}
 }
 
@@ -54,6 +58,7 @@ func (ss Services) StartObserveMetrics() {
 		"update_extracting_waiting_time": ss.queueWaitingTimeService.UpdateExtracted,
 		"update_in_queue_waiting_time":   ss.queueWaitingTimeService.UpdateQueued,
 		"update_complete_waiting_time":   ss.queueWaitingTimeService.UpdateComplete,
+		"update_workers_count":           ss.workersCountService.UpdateWorkersCount,
 	}
 
 	for {

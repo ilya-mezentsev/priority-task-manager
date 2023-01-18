@@ -7,16 +7,10 @@ type (
 		MaxWorkersCount int `json:"max_workers_count"`
 	}
 
-	RedisSettings struct {
-		Address  string `json:"address"`
-		Password string `json:"password"`
-		DB       int    `json:"db"`
-	}
-
 	Settings struct {
 		DB            settings.DBSettings       `json:"db"`
 		RabbitMQ      settings.RabbitMQSettings `json:"rabbitmq"`
+		RedisSettings settings.RedisSettings    `json:"redis"`
 		WorkersPool   WorkersPoolSettings       `json:"workers_pool"`
-		RedisSettings RedisSettings             `json:"redis"`
 	}
 )
